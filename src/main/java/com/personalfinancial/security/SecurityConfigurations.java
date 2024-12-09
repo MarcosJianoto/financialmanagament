@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfigurations {
 
 	@Autowired
-	SecurityFilter securityFilter;
+	private SecurityFilter securityFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -30,26 +30,26 @@ public class SecurityConfigurations {
 						// register and login user
 						.requestMatchers(HttpMethod.POST, "/login").permitAll()
 						.requestMatchers(HttpMethod.POST, "/register").permitAll()
-						.requestMatchers(HttpMethod.POST, "/expenses").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/expenses").permitAll()
 
 						// Permissions for revenues
-						.requestMatchers(HttpMethod.POST, "/saverevenues").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.GET, "/getrevenues/{idUser}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/updaterevenues/{idUser}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/deleterevenues{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/saverevenues").permitAll()
+						.requestMatchers(HttpMethod.GET, "/getrevenues/{idUser}").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/updaterevenues/{idUser}").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/deleterevenues{id}").permitAll()
 
 						// Permissions for expenses
-						.requestMatchers(HttpMethod.POST, "/saveexpenses").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.GET, "/getexpenses/{idUser}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/updateexpenses/{idUser}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/deleteexpenses/{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/saveexpenses").permitAll()
+						.requestMatchers(HttpMethod.GET, "/getexpenses/{idUser}").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/updateexpenses/{idUser}").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/deleteexpenses/{id}").permitAll()
 
 						// Permissions for category
-						.requestMatchers(HttpMethod.POST, "/financialcategory").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.GET, "/financialcategory/{id}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/financialcategory/{id}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/editcategorycolor/{id}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/financialcategory/{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/financialcategory").permitAll()
+						.requestMatchers(HttpMethod.GET, "/financialcategory/{id}").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/financialcategory/{id}").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/editcategorycolor/{id}").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/financialcategory/{id}").permitAll()
 
 						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();

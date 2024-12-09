@@ -10,8 +10,6 @@ public class PersonalFinancialManagementApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PersonalFinancialManagementApplication.class, args);
-		
-		System.out.println("Teste");
 	}
 
 }
