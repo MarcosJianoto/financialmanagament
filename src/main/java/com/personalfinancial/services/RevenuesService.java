@@ -1,7 +1,6 @@
 package com.personalfinancial.services;
 
 import java.time.LocalDateTime;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -92,42 +91,64 @@ public class RevenuesService {
 
 	}
 
-	/*
-	 * public RevenuesDTO getRevenuesUn(Long id) {
-	 * 
-	 * String authenticatedUserId = getAuthenticatedUserId();
-	 * 
-	 * 
-	 * }
-	 */
-
-	public List<RevenuesDTO> getRevenues(Long id) {
+	public RevenuesDTO getRevenuesUn(Long id) {
 
 		String authenticatedUserId = getAuthenticatedUserId();
 
 		UsersFinancial findUsersId = usersFinancialRepository.findEntityByEmail(authenticatedUserId)
 				.orElseThrow(() -> new IllegalArgumentException("User not found with email: " + authenticatedUserId));
 
-		if (findUsersId != null) {
+		Optional<Revenues> findRevenuesId = revenuesRepository.findById(id);
 
-			List<Revenues> findUserId = revenuesRepository.findByUsersFinancial_Id(id);
-			List<RevenuesDTO> revenuesDTOs = new ArrayList<>();
+		RevenuesDTO revenuesDTO = new RevenuesDTO();
 
-			for (Revenues revenues : findUserId) {
+		if (findRevenuesId.isPresent() && findUsersId.isEnabled()) {
 
-				RevenuesDTO revenuesDTO = new RevenuesDTO();
-				revenuesDTO.setAmount(revenues.getAmount());
-				revenuesDTO.setDescription(revenues.getDescription());
-				revenuesDTO.setDateHourFinancial(revenues.getDateHourFinancial().toString());
-				revenuesDTO.setPaymentMethod(revenues.getPaymentMethod());
-				revenuesDTO.setCategoryId(revenues.getCategory().getId());
-				revenuesDTO.setUsersFinancialId(revenues.getId());
-				revenuesDTOs.add(revenuesDTO);
+			Revenues revenues = findRevenuesId.get();
 
-			}
-			return revenuesDTOs;
+			revenuesDTO.setAmount(revenues.getAmount());
+			revenuesDTO.setCategoryId(revenues.getCategory().getId());
+			revenuesDTO.setDateHourFinancial(revenues.getDateHourFinancial().toString());
+			revenuesDTO.setDescription(revenues.getDescription());
+			revenuesDTO.setPaymentMethod(revenues.getPaymentMethod());
+			revenuesDTO.setUsersFinancialId(revenues.getUsersFinancial().getId());
+			revenuesDTO.setId(id);
+
 		}
-		return null;
+
+		if (revenuesDTO.getDescription() == null) {
+			return null;
+		} else {
+			return revenuesDTO;
+		}
+
+	}
+
+	public List<RevenuesDTO> getRevenues() {
+
+		String authenticatedUserId = getAuthenticatedUserId();
+
+		UsersFinancial findUsersId = usersFinancialRepository.findEntityByEmail(authenticatedUserId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found with email: " + authenticatedUserId));
+
+		List<Revenues> findRevenuesWithUserId = revenuesRepository.findByUsersFinancial_Id(findUsersId.getId());
+
+		List<RevenuesDTO> revenuesDTOs = new ArrayList<>();
+
+		for (Revenues revenues : findRevenuesWithUserId) {
+
+			RevenuesDTO revenuesDTO = new RevenuesDTO();
+			revenuesDTO.setAmount(revenues.getAmount());
+			revenuesDTO.setDescription(revenues.getDescription());
+			revenuesDTO.setDateHourFinancial(revenues.getDateHourFinancial().toString());
+			revenuesDTO.setPaymentMethod(revenues.getPaymentMethod());
+			revenuesDTO.setCategoryId(revenues.getCategory().getId());
+			revenuesDTO.setUsersFinancialId(revenues.getUsersFinancial().getId());
+			revenuesDTOs.add(revenuesDTO);
+
+		}
+
+		return revenuesDTOs;
 
 	}
 

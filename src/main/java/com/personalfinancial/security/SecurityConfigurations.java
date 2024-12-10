@@ -34,8 +34,11 @@ public class SecurityConfigurations {
 
 						// Permissions for revenues
 						.requestMatchers(HttpMethod.POST, "/saverevenues").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.GET, "/getrevenues/{id}").permitAll()
+						.requestMatchers(HttpMethod.GET, "/getrevenuesun/{id}").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.PUT, "/updaterevenues/{id}").permitAll()
+
+						// ainda nao estão corretos.
+						.requestMatchers(HttpMethod.GET, "/getrevenues/{id}").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/deleterevenues{id}").hasRole("ADMIN")
 
 						// Permissions for expenses

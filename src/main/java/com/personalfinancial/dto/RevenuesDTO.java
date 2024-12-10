@@ -18,6 +18,20 @@ public class RevenuesDTO {
 
 	private PaymentMethod paymentMethod;
 
+	public RevenuesDTO() {
+	}
+
+	public RevenuesDTO(Long id, Long categoryId, Long usersFinancialId, String description, Double amount,
+			String dateHourFinancial, PaymentMethod paymentMethod) {
+		this.id = id;
+		this.categoryId = categoryId;
+		this.usersFinancialId = usersFinancialId;
+		this.description = description;
+		this.amount = amount;
+		this.dateHourFinancial = dateHourFinancial;
+		this.paymentMethod = paymentMethod;
+	}
+
 	public Long getId() {
 		return id;
 	}

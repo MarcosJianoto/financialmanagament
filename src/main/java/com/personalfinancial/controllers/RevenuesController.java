@@ -36,10 +36,17 @@ public class RevenuesController {
 
 	}
 
-	@GetMapping("/getrevenues")
-	public ResponseEntity<List<RevenuesDTO>> getRevenues(@PathVariable Long id) {
+	@GetMapping("/getrevenuesun/{id}")
+	public ResponseEntity<RevenuesDTO> getRevenuesUn(@PathVariable Long id) {
 
-		List<RevenuesDTO> revenuesDTO = revenuesService.getRevenues(id);
+		RevenuesDTO revenuesDTO = revenuesService.getRevenuesUn(id);
+		return ResponseEntity.ok().body(revenuesDTO);
+	}
+
+	@GetMapping("/getrevenues")
+	public ResponseEntity<List<RevenuesDTO>> getRevenues() {
+
+		List<RevenuesDTO> revenuesDTO = revenuesService.getRevenues();
 		return ResponseEntity.ok().body(revenuesDTO);
 	}
 
