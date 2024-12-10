@@ -1,17 +1,20 @@
 package com.personalfinancial.entities;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 public enum UserRole {
 
-	STANDARD("standard"), PREMIUM("premium"), ADMIN("admin");
+	ROLE_STANDARD("ROLE_STANDARD"), ROLE_PREMIUM("ROLE_PREMIUM"), ROLE_ADMIN("ROLE_ADMIN");
 
-	private String role;
+	private final String role;
 
 	UserRole(String role) {
 		this.role = role;
 	}
 
-	public String getRole() {
-		return role;
+	public GrantedAuthority asAuthority() {
+		return new SimpleGrantedAuthority(role);
 	}
 
 }

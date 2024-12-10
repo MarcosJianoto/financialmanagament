@@ -68,45 +68,66 @@ public class RevenuesService {
 
 	public void updateRevenues(Long id, RevenuesDTO revenuesDTO) {
 
+		String authenticatedUserId = getAuthenticatedUserId();
+
+		UsersFinancial findUsersId = usersFinancialRepository.findEntityByEmail(authenticatedUserId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found with email: " + authenticatedUserId));
+
 		Optional<Revenues> findRevenuesId = revenuesRepository.findById(id);
-		Optional<UsersFinancial> findUserId = usersFinancialRepository.findById(revenuesDTO.getUsersFinancialId());
 		Optional<Category> findCategoryId = categoryRepository.findById(revenuesDTO.getCategoryId());
 
-		if (findRevenuesId.isPresent() && findUserId.isPresent() && findCategoryId.isPresent()) {
+		if (findRevenuesId.isPresent() && findUsersId != null && findCategoryId.isPresent()) {
 
-			Revenues revenues = new Revenues();
+			Revenues revenues = findRevenuesId.get();
 			revenues.setAmount(revenuesDTO.getAmount());
 			revenues.setDateHourFinancial(LocalDateTime.now());
 			revenues.setDescription(revenuesDTO.getDescription());
 			revenues.setPaymentMethod(revenuesDTO.getPaymentMethod());
-			revenues.setUsersFinancial(findUserId.get());
+			revenues.setUsersFinancial(findUsersId);
 			revenues.setCategory(findCategoryId.get());
 
-			revenuesRepository.save(findRevenuesId.get());
+			revenuesRepository.save(revenues);
 
 		}
 
 	}
 
+	/*
+	 * public RevenuesDTO getRevenuesUn(Long id) {
+	 * 
+	 * String authenticatedUserId = getAuthenticatedUserId();
+	 * 
+	 * 
+	 * }
+	 */
+
 	public List<RevenuesDTO> getRevenues(Long id) {
 
-		List<Revenues> findUserId = revenuesRepository.findByUsersFinancial_Id(id);
-		List<RevenuesDTO> revenuesDTOs = new ArrayList<>();
+		String authenticatedUserId = getAuthenticatedUserId();
 
-		for (Revenues revenues : findUserId) {
+		UsersFinancial findUsersId = usersFinancialRepository.findEntityByEmail(authenticatedUserId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found with email: " + authenticatedUserId));
 
-			RevenuesDTO revenuesDTO = new RevenuesDTO();
-			revenuesDTO.setAmount(revenues.getAmount());
-			revenuesDTO.setDescription(revenues.getDescription());
-			revenuesDTO.setDateHourFinancial(revenues.getDateHourFinancial().toString());
-			revenuesDTO.setPaymentMethod(revenues.getPaymentMethod());
-			revenuesDTO.setCategoryId(revenues.getCategory().getId());
-			revenuesDTO.setUsersFinancialId(revenues.getId());
-			revenuesDTOs.add(revenuesDTO);
+		if (findUsersId != null) {
 
+			List<Revenues> findUserId = revenuesRepository.findByUsersFinancial_Id(id);
+			List<RevenuesDTO> revenuesDTOs = new ArrayList<>();
+
+			for (Revenues revenues : findUserId) {
+
+				RevenuesDTO revenuesDTO = new RevenuesDTO();
+				revenuesDTO.setAmount(revenues.getAmount());
+				revenuesDTO.setDescription(revenues.getDescription());
+				revenuesDTO.setDateHourFinancial(revenues.getDateHourFinancial().toString());
+				revenuesDTO.setPaymentMethod(revenues.getPaymentMethod());
+				revenuesDTO.setCategoryId(revenues.getCategory().getId());
+				revenuesDTO.setUsersFinancialId(revenues.getId());
+				revenuesDTOs.add(revenuesDTO);
+
+			}
+			return revenuesDTOs;
 		}
-
-		return revenuesDTOs;
+		return null;
 
 	}
 

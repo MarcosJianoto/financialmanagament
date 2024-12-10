@@ -72,20 +72,7 @@ public class UsersFinancial implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-
-		List<GrantedAuthority> authorities = new ArrayList<>();
-
-		if (this.role == UserRole.ADMIN)
-			authorities.add(new SimpleGrantedAuthority("ADMIN"));
-
-		if (this.role == UserRole.PREMIUM)
-			authorities.add(new SimpleGrantedAuthority("PREMIUM"));
-
-		if (this.role == UserRole.STANDARD)
-			authorities.add(new SimpleGrantedAuthority("STANDARD"));
-
-		return authorities;
-
+		return List.of(this.role.asAuthority());
 	}
 
 	@Override

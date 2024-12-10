@@ -33,15 +33,15 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.POST, "/expenses").permitAll()
 
 						// Permissions for revenues
-						.requestMatchers(HttpMethod.POST, "/saverevenues").permitAll()
-						.requestMatchers(HttpMethod.GET, "/getrevenues/{idUser}").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/updaterevenues/{idUser}").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/deleterevenues{id}").permitAll()
+						.requestMatchers(HttpMethod.POST, "/saverevenues").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.GET, "/getrevenues/{id}").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/updaterevenues/{id}").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/deleterevenues{id}").hasRole("ADMIN")
 
 						// Permissions for expenses
 						.requestMatchers(HttpMethod.POST, "/saveexpenses").permitAll()
-						.requestMatchers(HttpMethod.GET, "/getexpenses/{idUser}").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/updateexpenses/{idUser}").permitAll()
+						.requestMatchers(HttpMethod.GET, "/getexpenses/{id}").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/updateexpenses/{id}").permitAll()
 						.requestMatchers(HttpMethod.DELETE, "/deleteexpenses/{id}").permitAll()
 
 						// Permissions for category
