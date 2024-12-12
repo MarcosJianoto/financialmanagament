@@ -16,13 +16,14 @@ public class CategoryService {
 	@Autowired
 	private CategoryRepository categoryRepository;
 
-	public void saveCategory(CategoryDTO categoryDTO) {
+	public Long saveCategory(CategoryDTO categoryDTO) {
 
 		Category category = new Category();
 		category.setName(categoryDTO.getName());
 		category.setCategoryColor(categoryDTO.getCategoryColor());
 
 		categoryRepository.save(category);
+		return category.getId();
 	}
 
 	public void updateCategory(Long id, CategoryDTO categoryDTO) {

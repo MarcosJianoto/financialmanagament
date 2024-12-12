@@ -35,24 +35,23 @@ public class SecurityConfigurations {
 						// Permissions for revenues
 						.requestMatchers(HttpMethod.POST, "/saverevenues").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.GET, "/getrevenuesun/{id}").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/updaterevenues/{id}").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/updaterevenues/{id}").hasRole("ADMIN")
 
-						// ainda nao estão corretos.
 						.requestMatchers(HttpMethod.GET, "/getrevenues/{id}").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/deleterevenues{id}").hasRole("ADMIN")
 
 						// Permissions for expenses
-						.requestMatchers(HttpMethod.POST, "/saveexpenses").permitAll()
-						.requestMatchers(HttpMethod.GET, "/getexpenses/{id}").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/updateexpenses/{id}").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/deleteexpenses/{id}").permitAll()
+						.requestMatchers(HttpMethod.POST, "/saveexpenses").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.GET, "/getexpenses/{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/updateexpenses/{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/deleteexpenses/{id}").hasRole("ADMIN")
 
 						// Permissions for category
-						.requestMatchers(HttpMethod.POST, "/financialcategory").permitAll()
-						.requestMatchers(HttpMethod.GET, "/financialcategory/{id}").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/financialcategory/{id}").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/editcategorycolor/{id}").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/financialcategory/{id}").permitAll()
+						.requestMatchers(HttpMethod.POST, "/financialcategory").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.GET, "/financialcategory/{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/financialcategory/{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/editcategorycolor/{id}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/financialcategory/{id}").hasRole("ADMIN")
 
 						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();

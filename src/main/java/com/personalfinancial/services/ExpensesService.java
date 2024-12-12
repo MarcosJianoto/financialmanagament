@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.personalfinancial.dto.ExpensesDTO;
 import com.personalfinancial.entities.Category;
 import com.personalfinancial.entities.Expenses;
-import com.personalfinancial.entities.Revenues;
 import com.personalfinancial.entities.UsersFinancial;
 import com.personalfinancial.repositories.CategoryRepository;
 import com.personalfinancial.repositories.ExpensesRepository;
@@ -29,63 +30,130 @@ public class ExpensesService {
 	@Autowired
 	private UsersFinancialRepository usersFinancialRepository;
 
+	public String getAuthenticatedUserId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication.getName();
+	}
+
 	public void saveExpenses(ExpensesDTO expensesDTO) {
 
-		Optional<Category> findCategory = categoryRepository.findById(expensesDTO.getCategoryId());
-		Optional<UsersFinancial> findUser = usersFinancialRepository.findById(expensesDTO.getUsersFinancialId());
+		String authenticationId = getAuthenticatedUserId();
 
-		if (findCategory.isPresent() && findUser.isPresent()) {
+		UsersFinancial findUserId = usersFinancialRepository.findEntityByEmail(authenticationId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found with email" + authenticationId));
+
+		Optional<Category> findCategory = categoryRepository.findById(expensesDTO.getCategoryId());
+
+		if (findCategory.isPresent() && findUserId.isEnabled()) {
 			Expenses expenses = new Expenses();
-			expenses.setCategory(findCategory.get());
-			expenses.setUsersFinancial(findUser.get());
-			expenses.setDescription(expensesDTO.getDescription());
 			expenses.setAmount(expensesDTO.getAmount());
 			expenses.setDateHourFinancial(LocalDateTime.now());
+			expenses.setDescription(expensesDTO.getDescription());
 			expenses.setPaymentMethod(expensesDTO.getPaymentMethod());
+			expenses.setUsersFinancial(findUserId);
+			expenses.setCategory(findCategory.get());
+
+			expensesRepository.save(expenses);
+		} else {
+
+			if (!findUserId.isEnabled()) {
+				throw new IllegalArgumentException("User does not exist");
+			}
+			if (!findCategory.isPresent()) {
+				throw new IllegalArgumentException("Category does not exist");
+			}
 		}
 	}
 
 	public void updateExpenses(Long id, ExpensesDTO expensesDTO) {
 
-		Optional<Expenses> findRevenuesId = expensesRepository.findById(id);
-		Optional<UsersFinancial> findUserId = usersFinancialRepository.findById(expensesDTO.getUsersFinancialId());
+		String authenticationId = getAuthenticatedUserId();
+
+		UsersFinancial findUserId = usersFinancialRepository.findEntityByEmail(authenticationId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found with email" + authenticationId));
+
+		Optional<Expenses> findExpensesId = expensesRepository.findById(id);
 		Optional<Category> findCategoryId = categoryRepository.findById(expensesDTO.getCategoryId());
 
-		if (findRevenuesId.isPresent() && findUserId.isPresent() && findCategoryId.isPresent()) {
+		if (findExpensesId.isPresent() && findUserId != null && findCategoryId.isPresent()) {
 
-			Revenues revenues = new Revenues();
-			revenues.setAmount(expensesDTO.getAmount());
-			revenues.setDateHourFinancial(LocalDateTime.now());
-			revenues.setDescription(expensesDTO.getDescription());
-			revenues.setPaymentMethod(expensesDTO.getPaymentMethod());
-			revenues.setUsersFinancial(findUserId.get());
-			revenues.setCategory(findCategoryId.get());
+			Expenses expenses = new Expenses();
+			expenses.setAmount(expensesDTO.getAmount());
+			expenses.setDateHourFinancial(LocalDateTime.now());
+			expenses.setDescription(expensesDTO.getDescription());
+			expenses.setPaymentMethod(expensesDTO.getPaymentMethod());
+			expenses.setUsersFinancial(findUserId);
+			expenses.setCategory(findCategoryId.get());
 
-			expensesRepository.save(findRevenuesId.get());
+			expensesRepository.save(findExpensesId.get());
 
 		}
 
 	}
 
-	public List<ExpensesDTO> getExpenses(Long idUser) {
+	public ExpensesDTO getExpensesUn(Long id) {
 
-		List<Expenses> findUserId = expensesRepository.findByUsersFinancial_Id(idUser);
-		List<ExpensesDTO> expensesDTOs = new ArrayList<>();
+		String authenticationId = getAuthenticatedUserId();
 
-		for (Expenses expenses : findUserId) {
+		UsersFinancial findUserId = usersFinancialRepository.findEntityByEmail(authenticationId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found with email " + authenticationId));
 
+		Optional<Expenses> expenses = expensesRepository.findById(id);
+
+		if (findUserId.isEnabled() && expenses.isPresent()) {
+			Expenses exp = expenses.get();
 			ExpensesDTO expensesDTO = new ExpensesDTO();
-			expensesDTO.setAmount(expenses.getAmount());
-			expensesDTO.setDescription(expenses.getDescription());
-			expensesDTO.setDateHourFinancial(expenses.getDateHourFinancial().toString());
-			expensesDTO.setPaymentMethod(expenses.getPaymentMethod());
-			expensesDTO.setCategoryId(expenses.getCategory().getId());
-			expensesDTO.setUsersFinancialId(expenses.getId());
-			expensesDTOs.add(expensesDTO);
 
+			expensesDTO.setAmount(exp.getAmount());
+			expensesDTO.setDescription(exp.getDescription());
+			expensesDTO.setDateHourFinancial(exp.getDateHourFinancial().toString());
+			expensesDTO.setPaymentMethod(exp.getPaymentMethod());
+			expensesDTO.setCategoryId(exp.getCategory().getId());
+			expensesDTO.setUsersFinancialId(exp.getId());
+			expensesDTO.setId(exp.getId());
+
+			return expensesDTO;
+
+		} else {
+			return null;
 		}
 
-		return expensesDTOs;
+	}
+
+	public List<ExpensesDTO> getExpenses() {
+
+		String authenticationId = getAuthenticatedUserId();
+
+		UsersFinancial findUserId = usersFinancialRepository.findEntityByEmail(authenticationId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found with email " + authenticationId));
+
+		List<Expenses> expenses = expensesRepository.findByUsersFinancial_Id(findUserId.getId());
+
+		List<ExpensesDTO> expensesDTOs = new ArrayList<>();
+
+		if (findUserId != null) {
+
+			for (Expenses exp : expenses) {
+
+				ExpensesDTO expensesDTO = new ExpensesDTO();
+
+				expensesDTO.setAmount(exp.getAmount());
+				expensesDTO.setDescription(exp.getDescription());
+				expensesDTO.setDateHourFinancial(exp.getDateHourFinancial().toString());
+				expensesDTO.setPaymentMethod(exp.getPaymentMethod());
+				expensesDTO.setCategoryId(exp.getCategory().getId());
+				expensesDTO.setUsersFinancialId(findUserId.getId());
+				expensesDTO.setId(exp.getId());
+				expensesDTOs.add(expensesDTO);
+
+			}
+
+		}
+		if (!expensesDTOs.isEmpty()) {
+			return expensesDTOs;
+		} else {
+			return null;
+		}
 
 	}
 

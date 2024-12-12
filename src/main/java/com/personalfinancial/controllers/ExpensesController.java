@@ -29,10 +29,17 @@ public class ExpensesController {
 
 	}
 
-	@GetMapping("/getexpenses/{id}")
-	public ResponseEntity<List<ExpensesDTO>> getExpenses(@PathVariable Long id) {
+	@GetMapping("/getexpensesun/{id}")
+	public ResponseEntity<ExpensesDTO> getExpensesUn(@PathVariable Long id) {
 
-		List<ExpensesDTO> expensesDTO = expensesService.getExpenses(id);
+		ExpensesDTO expensesDTO = expensesService.getExpensesUn(id);
+		return ResponseEntity.ok().body(expensesDTO);
+	}
+
+	@GetMapping("/getexpenses")
+	public ResponseEntity<List<ExpensesDTO>> getExpenses() {
+
+		List<ExpensesDTO> expensesDTO = expensesService.getExpenses();
 		return ResponseEntity.ok().body(expensesDTO);
 	}
 
@@ -44,7 +51,7 @@ public class ExpensesController {
 
 	}
 
-	@DeleteMapping("/deleteexpenses/{idUser}")
+	@DeleteMapping("/deleteexpenses/{id}")
 	public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
 
 		expensesService.deleteExpenses(id);

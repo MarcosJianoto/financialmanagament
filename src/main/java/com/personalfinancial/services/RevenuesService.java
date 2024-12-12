@@ -42,16 +42,16 @@ public class RevenuesService {
 		UsersFinancial findUsersId = usersFinancialRepository.findEntityByEmail(authenticatedUserId)
 				.orElseThrow(() -> new IllegalArgumentException("User not found with email: " + authenticatedUserId));
 
-		Optional<Category> findCategoryId = categoryRepository.findById(revenuesDTO.getCategoryId());
+		Optional<Category> findCategory = categoryRepository.findById(revenuesDTO.getCategoryId());
 
-		if (findUsersId.isEnabled() && findCategoryId.isPresent()) {
+		if (findUsersId.isEnabled() && findCategory.isPresent()) {
 			Revenues revenues = new Revenues();
 			revenues.setAmount(revenuesDTO.getAmount());
 			revenues.setDateHourFinancial(LocalDateTime.now());
 			revenues.setDescription(revenuesDTO.getDescription());
 			revenues.setPaymentMethod(revenuesDTO.getPaymentMethod());
 			revenues.setUsersFinancial(findUsersId);
-			revenues.setCategory(findCategoryId.get());
+			revenues.setCategory(findCategory.get());
 
 			revenuesRepository.save(revenues);
 		} else {
@@ -59,7 +59,7 @@ public class RevenuesService {
 			if (!findUsersId.isEnabled()) {
 				throw new IllegalArgumentException("User does not exist");
 			}
-			if (!findCategoryId.isPresent()) {
+			if (!findCategory.isPresent()) {
 				throw new IllegalArgumentException("Category does not exist");
 			}
 		}
@@ -112,7 +112,7 @@ public class RevenuesService {
 			revenuesDTO.setDescription(revenues.getDescription());
 			revenuesDTO.setPaymentMethod(revenues.getPaymentMethod());
 			revenuesDTO.setUsersFinancialId(revenues.getUsersFinancial().getId());
-			revenuesDTO.setId(id);
+			revenuesDTO.setId(revenues.getId());
 
 		}
 
@@ -144,6 +144,8 @@ public class RevenuesService {
 			revenuesDTO.setPaymentMethod(revenues.getPaymentMethod());
 			revenuesDTO.setCategoryId(revenues.getCategory().getId());
 			revenuesDTO.setUsersFinancialId(revenues.getUsersFinancial().getId());
+			revenuesDTO.setId(revenues.getId());
+
 			revenuesDTOs.add(revenuesDTO);
 
 		}
@@ -153,6 +155,7 @@ public class RevenuesService {
 	}
 
 	public void deleteRevenues(Long id) {
+
 		revenuesRepository.deleteById(id);
 	}
 
